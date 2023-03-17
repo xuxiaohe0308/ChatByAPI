@@ -42,6 +42,10 @@ def send_request(message):
         response = requests.post(URL, json=data, headers=headers, proxies=proxies, timeout=300)
     else:
         response = requests.post(URL, json=data, headers=headers, timeout=300)
+
+    if response.status_code >= 300 or response.status_code < 200:
+        raise ConnectionError('Server response error! {}, \'{}\''.format(response.status_code, json.loads(response.content)['error']['message']))
+
     content = json.loads(response.content)
     return content
 
