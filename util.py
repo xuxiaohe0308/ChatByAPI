@@ -66,7 +66,7 @@ def read_conversation():
 
 def write_conversation(conversation):
     with open(CONV_FILENAME, 'a') as f:
-        f.writelines(json.dumps(conversation) + '\n')
+        f.writelines(json.dumps(conversation, ensure_ascii=False) + '\n')
 
 
 # https://platform.openai.com/docs/guides/chat/introduction
