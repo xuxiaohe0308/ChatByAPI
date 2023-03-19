@@ -1,7 +1,8 @@
 import requests
 from os import listdir
 import json
-from config import API_FILENAME, MODEL, URL, CONV_FILENAME
+import tiktoken
+from config import API_FILENAME, MODEL, URL, CONV_FILENAME, MAX_TOKENS
 try:
     from config import PROXY_PORT
 except:
@@ -28,6 +29,11 @@ def get_apikey():
 
 
 def send_request(message):
+    if MAX_TOKENS:
+        while num_tokens_from_messages(message) > MAX_TOKENS:
+            if len(message) == 1:
+                raise IndexError("Message too long!")
+            message = message[1:]
 
     headers = {"Content-Type": "application/json",
                "Authorization": "Bearer {}".format(get_apikey())
@@ -62,3 +68,24 @@ def write_conversation(conversation):
     with open(CONV_FILENAME, 'a') as f:
         f.writelines(json.dumps(conversation) + '\n')
 
+
+# https://platform.openai.com/docs/guides/chat/introduction
+def num_tokens_from_messages(messages, model="gpt-3.5-turbo-0301"):
+  """Returns the number of tokens used by a list of messages."""
+  try:
+      encoding = tiktoken.encoding_for_model(model)
+  except KeyError:
+      encoding = tiktoken.get_encoding("cl100k_base")
+  if model == "gpt-3.5-turbo-0301":  # note: future models may deviate from this
+      num_tokens = 0
+      for message in messages:
+          num_tokens += 4  # every message follows <im_start>{role/name}\n{content}<im_end>\n
+          for key, value in message.items():
+              num_tokens += len(encoding.encode(value))
+              if key == "name":  # if there's a name, the role is omitted
+                  num_tokens += -1  # role is always required and always 1 token
+      num_tokens += 2  # every reply is primed with <im_start>assistant
+      return num_tokens
+  else:
+      raise NotImplementedError(f"""num_tokens_from_messages() is not presently implemented for model {model}.
+  See https://github.com/openai/openai-python/blob/main/chatml.md for information on how messages are converted to tokens.""")

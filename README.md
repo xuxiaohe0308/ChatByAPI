@@ -8,7 +8,7 @@ This is only for personal use.
 
 Python3
 
-`pip3 install requests`
+`pip3 install requests, tiktoken`
 
 First, create a new file named `apikey` which includes your openai secret APIkey. This can be generated in https://platform.openai.com/account/api-keys
 
@@ -24,7 +24,7 @@ The conversation history is saved in `conversation.txt`. To show the full conver
 
 `python show_conversation.py`
 
-You can change your own proxy_port in `config.py`. For example, for Clash it's 7890 in default.
+You can change your own `PROXY_PORT` in `config.py`. For example, for Clash it's 7890 in default. If you do not need a proxy, just set `PROXY_PORT = 0`.
 
 ## Refs 
 
