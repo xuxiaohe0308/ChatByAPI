@@ -60,9 +60,10 @@ if __name__ == "__main__":
     except:
         pass
 
+    filename = prompt[:30] if len(prompt) > 30 else prompt
+    filename = filename.replace(' ', '_').replace('.', '_')
     for i, item in enumerate(content['data']):
         img_png = base64.b64decode(item['b64_json'])
-        with open('images/{}-{}.png'.format(prompt.replace(' ', '_'), i), 'wb') as f:
+        with open('images/{}-{}.png'.format(filename, i), 'wb') as f:
             f.write(img_png)
     print('Images were successfully generated and saved in \'images\' directory. ')
-    
